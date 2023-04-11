@@ -40,10 +40,11 @@ services:
             - ./sql.sql:/docker-entrypoint-initdb.d/sql.sql
 
 
+ # https://eff-certbot.readthedocs.io/en/stable/install.html#running-with-docker
     # certbot:
     #     container_name: certbot
     #     image: certbot/certbot:latest
-    #     command: certonly --webroot --webroot-path=/var/www/html --agree-tos --no-eff-email -d amiñaweb.es
+    #     command: certonly --webroot --webroot-path=/var/www/html --agree-tos --no-eff-email -d amiÃ±aweb.es
     #     volumes:
     #         - ./certbot/conf:/etc/letsencrypt
     #         - ./certbot/logs:/var/log/letsencrypt
