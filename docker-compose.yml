@@ -1,33 +1,50 @@
 version: '3'
 services:
     php:
-        # image: 'php:7.2-fpm'
         build:
-            context: ./docker
+            context: ./PHP
             dockerfile: php.Dockerfile
         container_name: ${APP_NAME:?err}-php
+        restart: 'on-failure'
         volumes:
-            - './app:/var/www/html'
+            - './WEB:/var/www/html'
         depends_on:
             - mariadb
 
     nginx:
-        image: nginx:latest
+        image: nginx:1.20.2
         container_name: ${APP_NAME:?err}-nginx
+        restart: 'on-failure'
         ports:
-            - '80:80'
+            - '8005:80'
             - '443:443'
         links:
             - 'php'
         volumes:
-            - './app:/var/www/html'
+            - './WEB:/var/www/html'
             - './config/nginx:/etc/nginx/conf.d'
 
     mariadb:
-        image: mariadb:10.3.9
+        image: mariadb:5.5.64
         container_name: ${APP_NAME:?err}-mariadb
         restart: 'on-failure'
+        ports:
+            - '3306:3306'
         environment:
             MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?err}
+            MYSQL_PASSWORD: ${MYSQL_PASSWORD:?err}
+            MYSQL_DATABASE: ${MYSQL_DATABASE:?err}
+            MYSQL_USER: ${MYSQL_USER:?err}
         volumes:
-            - ${PWD}
+            - ./db_data:/var/lib/mysql
+            - ./sql.sql:/docker-entrypoint-initdb.d/sql.sql
+
+
+    # certbot:
+    #     container_name: certbot
+    #     image: certbot/certbot:latest
+    #     command: certonly --webroot --webroot-path=/var/www/html --agree-tos --no-eff-email -d amiñaweb.es
+    #     volumes:
+    #         - ./certbot/conf:/etc/letsencrypt
+    #         - ./certbot/logs:/var/log/letsencrypt
+    #         - './WEB:/var/www/html'
